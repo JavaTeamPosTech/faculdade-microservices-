@@ -4,8 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,50 +17,21 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
-/**
- * Filtro que verifica um cabeçalho secreto para liberar chamadas Service-to-Service
- * para endpoints específicos (como GET /usuarios/{id}).
- */
 @Component
 public class InternalServiceFilter extends OncePerRequestFilter {
 
-    @Value("${app.internal-secret}")
-    private String requiredSecret;
-
-    private static final String INTERNAL_SECRET_HEADER = "X-Internal-Secret";
-    private static final String TARGET_PATH = "/usuarios/";
-    private static final String TARGET_METHOD = "GET";
-
-    public InternalServiceFilter(@Value("${app.internal-secret}") String requiredSecret) {
-        this.requiredSecret = requiredSecret;
-    }
-
-    /**
-     * Este método decide se o filtro DEVE ser executado.
-     * Devemos executá-lo SOMENTE se for o GET na rota de usuários.
-     */
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        String method = request.getMethod();
-
-        return !method.equals(TARGET_METHOD) || !path.startsWith(TARGET_PATH);
-    }
+    private static final String INTERNAL_SERVICE_HEADER = "X-Internal-Service";
+    private static final String INTERNAL_SERVICE_SECRET = "my-secret-key";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String clientSecret = request.getHeader(INTERNAL_SECRET_HEADER);
+        String header = request.getHeader(INTERNAL_SERVICE_HEADER);
 
-        if (clientSecret == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (requiredSecret.equals(clientSecret)) {
+        if (header != null && header.equals(INTERNAL_SERVICE_SECRET)) {
             UserDetails userDetails = new User(
-                    "ms-agendamento",
+                    "internal-service",
                     "",
                     Collections.singletonList(new SimpleGrantedAuthority("INTERNAL_SERVICE_ACCESS"))
             );
@@ -71,12 +41,8 @@ public class InternalServiceFilter extends OncePerRequestFilter {
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request, response);
-        } else {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType("application/json");
-            response.getWriter().write("{\"message\":\"Acesso negado: Chave de serviço interna inválida.\"}");
-            return;
         }
+
+        filterChain.doFilter(request, response);
     }
 }
