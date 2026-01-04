@@ -6,15 +6,15 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.6</version>
+    <version>3.2.5</version>
     <relativePath/>
   </parent>
 
-  <groupId>com.postechfiap.meuhospital</groupId>
-  <artifactId>meuhospital-parent</artifactId>
+  <groupId>com.postechfiap.faculdade</groupId>
+  <artifactId>faculdade-parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Meu Hospital - Monorepo Parent</name>
+  <name>Faculdade - Monorepo Parent</name>
 
   <properties>
     <java.version>21</java.version>
@@ -30,11 +30,9 @@
   </properties>
 
   <modules>
-    <module>meuhospital-contracts</module>
+    <module>faculdade-contracts</module>
     <module>ms-autenticacao</module>
-    <module>ms-agendamento</module>
     <module>ms-notificacao</module>
-    <module>ms-historico</module>
   </modules>
 
   <dependencyManagement>

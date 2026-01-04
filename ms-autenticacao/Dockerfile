@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY pom.xml .
 
-COPY meuhospital-contracts/pom.xml ./meuhospital-contracts/
+COPY faculdade-contracts/pom.xml ./faculdade-contracts/
 COPY ms-autenticacao/pom.xml ./ms-autenticacao/
 
 COPY ms-agendamento/pom.xml ./ms-agendamento/
@@ -12,7 +12,7 @@ COPY ms-historico/pom.xml ./ms-historico/
 
 RUN mvn dependency:go-offline -B
 
-COPY meuhospital-contracts/src ./meuhospital-contracts/src
+COPY faculdade-contracts/src ./faculdade-contracts/src
 COPY ms-autenticacao/src ./ms-autenticacao/src
 
 RUN mvn clean install -pl ms-autenticacao -am -Dfile.encoding=UTF-8 -B -V -DskipTests

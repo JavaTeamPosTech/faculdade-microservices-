@@ -4,9 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.postechfiap.meuhospital</groupId>
-		<artifactId>meuhospital-parent</artifactId>
+		<groupId>com.postechfiap.faculdade</groupId>
+		<artifactId>faculdade-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<packaging>jar</packaging>
@@ -50,8 +51,8 @@
 
 		<!-- Módulo de Contratos -->
 		<dependency>
-			<groupId>com.postechfiap.meuhospital</groupId>
-			<artifactId>meuhospital-contracts</artifactId>
+			<groupId>com.postechfiap.faculdade</groupId>
+			<artifactId>faculdade-contracts</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
