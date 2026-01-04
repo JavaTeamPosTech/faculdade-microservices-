@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -147,11 +148,23 @@ public class UsuarioServiceImpl implements UsuarioService {
         Role role = request.role();
         log.debug("Validando campos condicionais para a Role: {}", role);
 
+        if (role == null) {
+            throw new IllegalArgumentException("A Role (perfil) é obrigatória.");
+        }
+
         // Validação de Matrícula (Aluno)
         if (role == Role.ALUNO) {
             if (request.matricula() == null || request.matricula().isBlank()) {
                 log.warn("Validação falhou: Aluno sem matrícula.");
                 throw new IllegalArgumentException("Aluno deve fornecer a matrícula.");
+            }
+            if (request.dataNascimento() == null) {
+                log.warn("Validação falhou: Aluno sem data de nascimento.");
+                throw new IllegalArgumentException("Aluno deve fornecer a data de nascimento.");
+            }
+            if (request.dataNascimento().isAfter(LocalDate.now())) {
+                log.warn("Validação falhou: Data de nascimento futura.");
+                throw new IllegalArgumentException("A data de nascimento não pode ser no futuro.");
             }
         }
 
@@ -160,14 +173,6 @@ public class UsuarioServiceImpl implements UsuarioService {
             if (request.departamento() == null || request.departamento().isBlank()) {
                 log.warn("Validação falhou: {} sem departamento.", role);
                 throw new IllegalArgumentException(role.name() + " deve fornecer o departamento.");
-            }
-        }
-
-        // Validação de Data de Nascimento (Apenas Aluno)
-        if (role == Role.ALUNO) {
-            if (request.dataNascimento() == null) {
-                log.warn("Validação falhou: Aluno sem data de nascimento.");
-                throw new IllegalArgumentException("Aluno deve fornecer a data de nascimento.");
             }
         }
     }

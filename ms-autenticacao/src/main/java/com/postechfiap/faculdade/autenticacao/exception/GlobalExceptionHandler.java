@@ -1,9 +1,11 @@
 package com.postechfiap.faculdade.autenticacao.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +44,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
         log.warn("Argumento inválido: {}", ex.getMessage());
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /**
+     * Trata erros de desserialização JSON, como Enums inválidos (ex: Role inexistente).
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        String message = "Erro na leitura do JSON. Verifique o formato dos dados.";
+
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
+            if (ifx.getTargetType() != null && ifx.getTargetType().isEnum()) {
+                String enumValues = Arrays.toString(ifx.getTargetType().getEnumConstants());
+                message = String.format("Valor inválido para o campo '%s'. Valores aceitos: %s",
+                        ifx.getPath().get(ifx.getPath().size() - 1).getFieldName(),
+                        enumValues);
+            }
+        }
+
+        log.warn("Erro de leitura JSON: {}", message);
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
