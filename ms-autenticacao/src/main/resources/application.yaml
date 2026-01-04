@@ -6,9 +6,9 @@ spring:
   # 1. CONFIGURAÇÃO DE BANCO DE DADOS
   # ----------------------------------------------------
   datasource:
-    url: jdbc:postgresql://${AUTH_SERVICE_HOST}:${DB_PORT}/${AUTENTICACAO_DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${AUTH_SERVICE_HOST:localhost}:${DB_PORT:5432}/${AUTENTICACAO_DB_NAME:autenticacao_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     continue-on-error: true
     initialization-mode: never
@@ -41,7 +41,7 @@ spring:
   # 3. CONFIGURAÇÃO KAFKA (PRODUTOR)
   # ----------------------------------------------------
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       client-id: ms-autenticacao-producer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -54,9 +54,9 @@ spring:
 # ----------------------------------------------------
 app:
   jwt:
-    secret: ${APP_JWT_SECRET}
-    expiration: ${APP_JWT_EXPIRATION_MS}
-  internal-secret: ${INTERNAL_SECRET}
+    secret: ${APP_JWT_SECRET:my-secret-key-1234567890123456789012345678901234567890123456789012345678901234}
+    expiration: ${APP_JWT_EXPIRATION_MS:86400000}
+  internal-secret: ${INTERNAL_SECRET:my-internal-secret}
 
 # ----------------------------------------------------
 # DOCUMENTAÇÃO E LOGS
