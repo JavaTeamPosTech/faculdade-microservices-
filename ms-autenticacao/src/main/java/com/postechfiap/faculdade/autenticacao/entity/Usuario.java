@@ -1,6 +1,6 @@
 package com.postechfiap.faculdade.autenticacao.entity;
 
-import com.postechfiap.meuhospital.contracts.core.Role;
+import com.postechfiap.faculdade.autenticacao.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,10 +46,10 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String telefone;
 
-    @Column(name = "registro_profissional")
-    private String numeroRegistro;
+    @Column(name = "matricula")
+    private String matricula;
 
-    private String especialidade;
+    private String departamento;
 
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;

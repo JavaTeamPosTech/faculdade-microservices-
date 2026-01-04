@@ -1,12 +1,10 @@
 package com.postechfiap.faculdade.autenticacao.security;
 
-import com.postechfiap.meuhospital.contracts.core.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,8 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Filtro que verifica um cabeçalho secreto para liberar chamadas Service-to-Service
