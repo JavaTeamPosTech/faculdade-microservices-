@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+spring:
+  # ----------------------------------------------------
+  # 1. CONFIGURAÇÃO DE BANCO DE DADOS
+  # ----------------------------------------------------
+  datasource:
+    url: jdbc:postgresql://${AUTH_SERVICE_HOST}:${DB_PORT}/${AUTENTICACAO_DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    continue-on-error: true
+    initialization-mode: never
+    platform: postgresql
+    hikari:
+      max-lifetime: 1800000
+  sql:
+    init:
+      mode: never
+  jpa:
+    hibernate:
+      hbm2ddl:
+        import_files:
+          classpath:  import.sql
+      ddl-auto: update
+    show-sql: false # Desabilita logs de query SQL no console
+    properties:
+      hibernate:
+        format_sql: false # Desabilita a formatação de SQL
+        jdbc:
+          time_zone: UTC
+
+  # ----------------------------------------------------
+  # 2. SERIALIZAÇÃO E Jackson
+  # ----------------------------------------------------
+  jackson:
+    default-property-inclusion: non_null # Omite campos nulos no JSON de resposta
+
+  # ----------------------------------------------------
+  # 3. CONFIGURAÇÃO KAFKA (PRODUTOR)
+  # ----------------------------------------------------
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      client-id: ms-autenticacao-producer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.properties.enabled: false
+
+# ----------------------------------------------------
+# CONFIGURAÇÕES DE DOMÍNIO E SEGURANÇA
+# ----------------------------------------------------
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET}
+    expiration: ${APP_JWT_EXPIRATION_MS}
+  internal-secret: ${INTERNAL_SECRET}
+
+# ----------------------------------------------------
+# DOCUMENTAÇÃO E LOGS
+# ----------------------------------------------------
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: INFO
+    com.postechfiap: DEBUG

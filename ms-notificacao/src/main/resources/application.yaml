@@ -1,0 +1,45 @@
+server:
+  port: 8082
+
+spring:
+  # ----------------------------------------------------
+  # 1. CONFIGURAÇÃO KAFKA (CONSUMIDOR)
+  # ----------------------------------------------------
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: notificacao-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  # ----------------------------------------------------
+  # 2. CONFIGURAÇÃO MONGODB (AUDITORIA)
+  # ----------------------------------------------------
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+
+  # ----------------------------------------------------
+  # 3. CONFIGURAÇÃO SPRING MAIL (MAILHOG SMTP)
+  # ----------------------------------------------------
+  mail:
+    host: ${SPRING_MAIL_HOST}
+    port: ${SPRING_MAIL_PORT}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls.enable: false
+
+# ----------------------------------------------------
+# CONFIGURAÇÕES DE DOMÍNIO E LOGS
+# ----------------------------------------------------
+app:
+  kafka:
+    topic-notificacao: notificacao-events
+
+logging:
+  level:
+    root: INFO
+    com.postechfiap: DEBUG
+    org.springframework.mail: DEBUG

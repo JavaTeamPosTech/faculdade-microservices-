@@ -1,0 +1,12 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  kafka:
+    bootstrap-servers: localhost:9093
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/autenticacao_db
+
+server:
+  port: 8080
