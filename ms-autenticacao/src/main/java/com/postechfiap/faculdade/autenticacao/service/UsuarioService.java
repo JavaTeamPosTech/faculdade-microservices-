@@ -1,5 +1,7 @@
 package com.postechfiap.faculdade.autenticacao.service;
 
+import com.postechfiap.faculdade.autenticacao.dto.LoginRequest;
+import com.postechfiap.faculdade.autenticacao.dto.LoginResponse;
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioRegisterRequest;
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioResponse;
 import com.postechfiap.faculdade.autenticacao.entity.Usuario;
@@ -11,4 +13,5 @@ public interface UsuarioService {
     UsuarioResponse criarUsuario(UsuarioRegisterRequest request);
     UsuarioResponse buscarUsuarioPorId(UUID id);
     Optional<Usuario> buscarUsuarioPorEmail(String email);
+    LoginResponse autenticarUsuario(LoginRequest request);
 }

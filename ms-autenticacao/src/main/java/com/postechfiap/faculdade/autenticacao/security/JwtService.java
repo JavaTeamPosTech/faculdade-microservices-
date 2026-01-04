@@ -47,10 +47,8 @@ public class JwtService {
 
         if (principal instanceof Usuario) {
             user = (Usuario) principal;
-        } else if (principal instanceof UserDetails) {
-             throw new IllegalArgumentException("Principal não é do tipo Usuario: " + principal.getClass());
         } else {
-             throw new IllegalArgumentException("Tipo de Principal desconhecido: " + principal.getClass());
+             throw new IllegalArgumentException("Principal não é do tipo Usuario: " + principal.getClass());
         }
 
         Map<String, Object> claims = new HashMap<>();

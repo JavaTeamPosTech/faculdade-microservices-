@@ -4,10 +4,7 @@ import com.postechfiap.faculdade.autenticacao.dto.LoginRequest;
 import com.postechfiap.faculdade.autenticacao.dto.LoginResponse;
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioRegisterRequest;
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioResponse;
-import com.postechfiap.faculdade.autenticacao.exception.RecursoNaoEncontradoException;
-import com.postechfiap.faculdade.autenticacao.mapper.UsuarioMapper;
-import com.postechfiap.faculdade.autenticacao.security.JwtService;
-import com.postechfiap.faculdade.autenticacao.service.UsuarioService;
+import com.postechfiap.faculdade.autenticacao.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,10 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -32,16 +25,10 @@ public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final UsuarioService usuarioService;
-    private final UsuarioMapper usuarioMapper;
+    private final AuthService authService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, UsuarioService usuarioService, UsuarioMapper usuarioMapper) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.usuarioService = usuarioService;
-        this.usuarioMapper = usuarioMapper;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     /**
@@ -57,7 +44,7 @@ public class AuthController {
     public ResponseEntity<UsuarioResponse> cadastrar(@RequestBody @Valid UsuarioRegisterRequest request) {
         log.info("INICIANDO: POST /auth/register para E-mail: {} e Role: {}", request.email(), request.role());
 
-        UsuarioResponse response = usuarioService.criarUsuario(request);
+        UsuarioResponse response = authService.registrar(request);
 
         log.info("SUCESSO: Usuário ID {} criado.", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -74,32 +61,7 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         log.info("INICIANDO: POST /auth/login para E-mail: {}", request.email());
 
-        try {
-            // 1. Autenticação (Verificação de senha)
-            var authToken = new UsernamePasswordAuthenticationToken(request.email(), request.senha());
-            Authentication authentication = authenticationManager.authenticate(authToken);
-
-            // 2. Geração do Token
-            String token = jwtService.generateToken(authentication);
-            log.debug("JWT gerado para o usuário: {}", request.email());
-
-            // 3. Busca de Detalhes para Resposta
-            UsuarioResponse usuarioResponse = usuarioService.buscarUsuarioPorEmail(request.email())
-                    .map(usuarioMapper::toResponse)
-                    .orElseThrow(() -> {
-                        log.error("ERRO GRAVE: Usuário autenticado ({}) não encontrado no banco.", request.email());
-                        return new RecursoNaoEncontradoException("Usuário não encontrado após autenticação.");
-                    });
-
-            log.info("SUCESSO: Login concluído. JWT e dados do usuário retornados.");
-            return ResponseEntity.ok(new LoginResponse(token, usuarioResponse));
-
-        } catch (BadCredentialsException e) {
-            log.warn("FALHA LOGIN: Credenciais inválidas para o e-mail: {}", request.email());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (Exception e) {
-            log.error("ERRO INESPERADO no login para o e-mail: {}", request.email(), e);
-            throw e; // Relança para retornar 500, mas agora temos o log
-        }
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

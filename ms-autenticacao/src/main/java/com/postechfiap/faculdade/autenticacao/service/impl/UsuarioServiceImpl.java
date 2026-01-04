@@ -1,5 +1,7 @@
 package com.postechfiap.faculdade.autenticacao.service.impl;
 
+import com.postechfiap.faculdade.autenticacao.dto.LoginRequest;
+import com.postechfiap.faculdade.autenticacao.dto.LoginResponse;
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioRegisterRequest;
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioResponse;
 import com.postechfiap.faculdade.autenticacao.entity.Usuario;
@@ -8,9 +10,15 @@ import com.postechfiap.faculdade.autenticacao.exception.RecursoNaoEncontradoExce
 import com.postechfiap.faculdade.autenticacao.exception.UsuarioExistenteException;
 import com.postechfiap.faculdade.autenticacao.mapper.UsuarioMapper;
 import com.postechfiap.faculdade.autenticacao.repository.UsuarioRepository;
+import com.postechfiap.faculdade.autenticacao.security.JwtService;
 import com.postechfiap.faculdade.autenticacao.service.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,11 +37,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
+                              UsuarioMapper usuarioMapper,
+                              PasswordEncoder passwordEncoder,
+                              @Lazy AuthenticationManager authenticationManager,
+                              JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -77,6 +93,36 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Optional<Usuario> buscarUsuarioPorEmail(String email) {
         log.debug("Tentativa de buscar usuário para autenticação por e-mail: {}", email);
         return usuarioRepository.findByEmail(email);
+    }
+
+    @Override
+    public LoginResponse autenticarUsuario(LoginRequest request) {
+        log.info("Iniciando processo de autenticação para o e-mail: {}", request.email());
+
+        try {
+            // 1. Autenticação (Verificação de senha)
+            var authToken = new UsernamePasswordAuthenticationToken(request.email(), request.senha());
+            Authentication authentication = authenticationManager.authenticate(authToken);
+
+            // 2. Geração do Token
+            String token = jwtService.generateToken(authentication);
+            log.debug("JWT gerado para o usuário: {}", request.email());
+
+            // 3. Busca de Detalhes para Resposta
+            UsuarioResponse usuarioResponse = usuarioRepository.findByEmail(request.email())
+                    .map(usuarioMapper::toResponse)
+                    .orElseThrow(() -> {
+                        log.error("ERRO GRAVE: Usuário autenticado ({}) não encontrado no banco.", request.email());
+                        return new RecursoNaoEncontradoException("Usuário não encontrado após autenticação.");
+                    });
+
+            log.info("SUCESSO: Login concluído. JWT e dados do usuário retornados.");
+            return new LoginResponse(token, usuarioResponse);
+
+        } catch (BadCredentialsException e) {
+            log.warn("FALHA LOGIN: Credenciais inválidas para o e-mail: {}", request.email());
+            throw e;
+        }
     }
 
     /**
