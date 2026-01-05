@@ -3,7 +3,6 @@ WORKDIR /app
 
 COPY pom.xml .
 
-COPY meuhospital-contracts/pom.xml ./meuhospital-contracts/
 COPY ms-autenticacao/pom.xml ./ms-autenticacao/
 
 COPY ms-agendamento/pom.xml ./ms-agendamento/

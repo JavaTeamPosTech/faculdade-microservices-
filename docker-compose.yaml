@@ -1,131 +1,71 @@
 services:
 
-  # ------ MS AUTENTICAÇÃO ------
-  db-auth:
+  # ------ DB CURSOS ------
+  db-cursos:
     image: postgres:16-alpine
-    container_name: db-auth
+    container_name: db-cursos
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${AUTENTICACAO_DB_NAME}
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./data/postgres_data/auth:/var/lib/postgresql/data
-    networks:
-      - hospital_network
-    restart: always
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  ms-autenticacao:
-    build:
-      context: .
-      dockerfile: ./ms-autenticacao/Dockerfile
-    container_name: ms-autenticacao
-    ports:
-      - "8080:8080"
-      - "5006:5005"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db-auth:5432/${AUTENTICACAO_DB_NAME}
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD:  ${DB_PASSWORD}
-      APP_JWT_SECRET: ${JWT_SECRET}
-      APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      AUTH_SERVICE_URL: http://ms-autenticacao:8080/usuarios
-      INTERNAL_SECRET: ${INTERNAL_SECRET}
-      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
-    depends_on:
-      db-auth:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-      zookeeper:
-        condition: service_started
-    restart: on-failure
-    networks:
-      - hospital_network
-
-  # ------  MS AGENDAMENTO ------
-  db-agendamento:
-    image: postgres:16-alpine
-    container_name: db-agendamento
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${AGENDAMENTO_DB_NAME}
+      POSTGRES_DB: ${CURSOS_DB_NAME}
     ports:
       - "5433:5432"
     volumes:
-      - ./data/postgres_data/agendamento:/var/lib/postgresql/data
+      - ./data/postgres_data/cursos:/var/lib/postgresql/data
     networks:
       - hospital_network
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  ms-agendamento:
+  # ------ MS CURSOS ------
+  ms-cursos:
     build:
       context: .
-      dockerfile: ./ms-agendamento/Dockerfile
-    container_name: ms-agendamento
+      dockerfile: ms-cursos/Dockerfile
+    container_name: ms-cursos
     ports:
-      - "8081:8081"
+      - "8084:8084"
       - "5005:5005"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db-agendamento:5432/${AGENDAMENTO_DB_NAME}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-cursos:5432/${CURSOS_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      APP_JWT_SECRET: ${JWT_SECRET}
-      APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      AUTH_SERVICE_URL: http://ms-autenticacao:8080/usuarios
-      INTERNAL_SECRET: ${INTERNAL_SECRET}
-      AUTH_SERVICE_HOST: ms-autenticacao
-      AUTH_SERVICE_PORT: 8080
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     depends_on:
-      db-agendamento:
+      db-cursos:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      ms-autenticacao:
-        condition: service_started
     restart: on-failure
     networks:
       - hospital_network
 
-  # ------  MS NOTIFICACAO ------
+  # ------ MS NOTIFICACAO ------
   ms-notificacao:
     build:
       context: .
-      dockerfile: ./ms-notificacao/Dockerfile
+      dockerfile: ms-notificacao/Dockerfile
     container_name: ms-notificacao
     ports:
       - "8082:8082"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_DATA_MONGODB_URI: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@mongodb:27017/${MONGODB_DB}?authSource=admin
-      SPRING_MAIL_HOST: mailhog
-      SPRING_MAIL_PORT: 1025
     depends_on:
       kafka:
         condition: service_healthy
-      mailhog:
-        condition: service_started
       db-notificacao-mongo:
         condition: service_started
     restart: on-failure
     networks:
       - hospital_network
 
+  # ------ MONGO ------
   db-notificacao-mongo:
     image: mongo:6.0
     container_name: mongodb
@@ -149,78 +89,27 @@ services:
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
-      ME_CONFIG_BASICAUTH_USERNAME: user_express
-      ME_CONFIG_BASICAUTH_PASSWORD: password_express
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_USER}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD}
-      ME_CONFIG_MONGODB_DATABASE: ${MONGODB_DB}
     depends_on:
       - db-notificacao-mongo
     networks:
       - hospital_network
 
-  # ------ MS HISTORICO ------
-  db-historico:
-    image: postgres:16-alpine
-    container_name: db-historico
-    volumes:
-      - ./data/postgres_data/historico:/var/lib/postgresql/data
-    networks:
-      - hospital_network
-    ports:
-      - "5434:5432"
-    restart: always
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${HISTORICO_DB_NAME}
-
-  ms-historico:
-    build:
-      context: .
-      dockerfile: ms-historico/Dockerfile
-    container_name: ms-historico
-    ports:
-      - "8084:8084"
-    environment:
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db-historico:5432/${HISTORICO_DB_NAME}
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      APP_JWT_SECRET: ${JWT_SECRET}
-      APP_JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
-    depends_on:
-      db-historico:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    networks:
-      - hospital_network
-    restart: always
-
-  # ------ KAFKA E ZOOKEEPER ------
+  # ------ ZOOKEEPER ------
   zookeeper:
     image: zookeeper:3.8
     container_name: zookeeper
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_CLIENT_PORT: 2181
-      ZOO_TICK_TIME: 2000
     networks:
       - hospital_network
 
+  # ------ KAFKA ------
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
     depends_on:
-      zookeeper:
-        condition: service_started
+      - zookeeper
     ports:
       - "9092:9092"
       - "9093:9093"
@@ -228,42 +117,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    networks:
-      - hospital_network
-    healthcheck:
-      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka:9092 || exit 1" ]
-      interval: 10s
-      timeout: 10s
-      retries: 20
-      start_period: 15s
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
-    ports:
-      - "8085:8080"
-    depends_on:
-      - kafka
-    environment:
-      KAFKA_CLUSTERS_0_NAME: meu-hospital-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-    networks:
-      - hospital_network
-
-  # ------ MAILHOG SMTP ------
-  mailhog:
-    image: mailhog/mailhog
-    container_name: mailhog
-    platform: linux/amd64
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-    networks:
-      - hospital_network
 
 networks:
   hospital_network:

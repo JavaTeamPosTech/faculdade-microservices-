@@ -9,13 +9,13 @@ WORKDIR /app
 COPY pom.xml .
 
 # Copia o POM do módulo
-COPY ms-notificacao/pom.xml ms-notificacao/pom.xml
+COPY ms-cursos/pom.xml ms-cursos/pom.xml
 
 # Copia o código-fonte do módulo
-COPY ms-notificacao/src ms-notificacao/src
+COPY ms-cursos/src ms-cursos/src
 
-# Builda apenas o módulo ms-notificacao, mas com o parent disponível
-RUN mvn -pl ms-notificacao -am package -DskipTests
+# Builda apenas o módulo ms-cursos, mas com o parent disponível
+RUN mvn -pl ms-cursos -am package -DskipTests
 
 # =========================
 # STAGE 2 - RUNTIME
@@ -25,7 +25,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Copia o JAR gerado
-COPY --from=build /app/ms-notificacao/target/*.jar app.jar
+COPY --from=build /app/ms-cursos/target/*.jar app.jar
 
 EXPOSE 8080
 

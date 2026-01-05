@@ -30,11 +30,9 @@
   </properties>
 
   <modules>
-    <module>meuhospital-contracts</module>
     <module>ms-autenticacao</module>
-    <module>ms-agendamento</module>
+    <module>ms-cursos</module>
     <module>ms-notificacao</module>
-    <module>ms-historico</module>
   </modules>
 
   <dependencyManagement>
