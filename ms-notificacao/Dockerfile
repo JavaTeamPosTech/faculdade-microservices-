@@ -5,17 +5,11 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-# Copia o POM pai
-COPY pom.xml .
+# Copia todo o monorepo
+COPY . .
 
-# Copia o POM do módulo
-COPY ms-notificacao/pom.xml ms-notificacao/pom.xml
-
-# Copia o código-fonte do módulo
-COPY ms-notificacao/src ms-notificacao/src
-
-# Builda apenas o módulo ms-notificacao, mas com o parent disponível
-RUN mvn -pl ms-notificacao -am package -DskipTests
+# Builda todos os módulos e instala no local repository do container
+RUN mvn clean install -DskipTests
 
 # =========================
 # STAGE 2 - RUNTIME
@@ -24,9 +18,11 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Copia o JAR gerado
+# Copia apenas o jar do ms-notificacao
 COPY --from=build /app/ms-notificacao/target/*.jar app.jar
 
-EXPOSE 8080
+# Porta que o microserviço vai expor
+EXPOSE 8082
 
+# Comando para iniciar a aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]

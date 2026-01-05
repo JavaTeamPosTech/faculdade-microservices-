@@ -14,7 +14,9 @@ public class AvaliacaoMapper {
 
     public AvaliacaoResponseDTO toDto(AvaliacaoEntity entity) {
         return new AvaliacaoResponseDTO(
+                entity.getId(),
                 entity.getIdCurso(),
+                entity.getIdUsuario(),
                 entity.getDescricao(),
                 entity.getNota()
         );

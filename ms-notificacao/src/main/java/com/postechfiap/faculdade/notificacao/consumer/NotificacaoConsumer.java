@@ -1,6 +1,5 @@
 package com.postechfiap.faculdade.notificacao.consumer;
 
-import com.postechfiap.faculdade.notificacao.consumer.dto.AvaliacaoCriadaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -28,10 +27,11 @@ public class NotificacaoConsumer {
             topics = "${app.kafka.topic-notificacao}",
             groupId = "notificacao-group"
     )
-    public void consume(AvaliacaoCriadaEvent event) {
+    public void consume(com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent event) {
 
         log.info("--- EVENTO RECEBIDO NO MS-NOTIFICACAO ---");
         log.info("Processando notificação para a consulta ID: {}", event.idAvaliacao());
+        System.out.println("Evento AvaliacaoCriadaEvent recebido: " + event);
 
         try {
             //notificacaoService.processarNotificacao(event);

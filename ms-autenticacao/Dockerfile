@@ -11,7 +11,7 @@ COPY ms-historico/pom.xml ./ms-historico/
 
 RUN mvn dependency:go-offline -B
 
-COPY meuhospital-contracts/src ./meuhospital-contracts/src
+#COPY meuhospital-contracts/src ./meuhospital-contracts/src
 COPY ms-autenticacao/src ./ms-autenticacao/src
 
 RUN mvn clean install -pl ms-autenticacao -am -Dfile.encoding=UTF-8 -B -V -DskipTests

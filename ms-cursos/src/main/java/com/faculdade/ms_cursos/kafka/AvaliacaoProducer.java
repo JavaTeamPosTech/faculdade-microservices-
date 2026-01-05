@@ -1,6 +1,6 @@
 package com.faculdade.ms_cursos.kafka;
 
-import com.faculdade.ms_cursos.kafka.dto.AvaliacaoCriadaEvent;
+import com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

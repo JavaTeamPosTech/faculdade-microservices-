@@ -1,6 +1,5 @@
 package com.postechfiap.faculdade.notificacao.log;
 
-import com.postechfiap.meuhospital.contracts.events.ConsultaCriadaEvent;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,15 +23,15 @@ public class NotificacaoLog {
     private String emailDestinatario;
     private String statusEnvio; // SUCESSO, FALHA, PENDENTE
     private LocalDateTime dataEnvio;
-    private ConsultaCriadaEvent dadosEvento; // Armazena o payload completo do Kafka para auditoria
+    //private ConsultaCriadaEvent dadosEvento; // Armazena o payload completo do Kafka para auditoria
 
-    public NotificacaoLog(ConsultaCriadaEvent event, String statusEnvio) {
-        this.consultaId = event.consultaId();
-        this.pacienteId = event.pacienteId();
-        this.tipoEvento = event.tipoEvento();
-        this.emailDestinatario = event.emailPaciente();
+    public NotificacaoLog(String statusEnvio) {//ConsultaCriadaEvent event,
+//        this.consultaId = event.consultaId();
+//        this.pacienteId = event.pacienteId();
+//        this.tipoEvento = event.tipoEvento();
+//        this.emailDestinatario = event.emailPaciente();
         this.statusEnvio = statusEnvio;
         this.dataEnvio = LocalDateTime.now();
-        this.dadosEvento = event;
+        //this.dadosEvento = event;
     }
 }

@@ -1,8 +1,8 @@
-package com.postechfiap.faculdade.notificacao.consumer.dto;
+package com.postechfiap.meuhospital.dto;
 
 import java.time.LocalDateTime;
 
-public record AvaliacaoCriadaEvent(
+public record AvaliacaoCriadaEvent (
     Long idAvaliacao,
     Long idUsuario,
     Long idCurso,

@@ -24,7 +24,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Minha faculdade - Microserviço de Avaliacao")
                         .version("1.0.0")
-                        .description("API REST para gestão de cursos .")
+                        .description("API REST para gestão de cursos.")
                 );
     }
 }

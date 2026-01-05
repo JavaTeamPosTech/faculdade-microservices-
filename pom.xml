@@ -6,8 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.6</version>
-    <relativePath/>
+    <version>3.5.6</version> <!-- ajuste para a versão que você quer -->
   </parent>
 
   <groupId>com.postechfiap.meuhospital</groupId>
@@ -30,9 +29,10 @@
   </properties>
 
   <modules>
-    <module>ms-autenticacao</module>
+    <module>ms-contracts</module>
     <module>ms-cursos</module>
     <module>ms-notificacao</module>
+<!--    <module>ms-autenticacao</module>-->
   </modules>
 
   <dependencyManagement>

@@ -6,4 +6,5 @@ import com.faculdade.ms_cursos.dto.response.AvaliacaoResponseDTO;
 public interface IAvaliacaoService {
 
     AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO avaliacao);
+    AvaliacaoResponseDTO buscarConsultaPorId(Long id);
 }

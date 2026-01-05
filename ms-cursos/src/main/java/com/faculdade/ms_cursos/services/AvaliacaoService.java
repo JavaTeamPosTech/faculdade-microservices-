@@ -5,8 +5,8 @@ import com.faculdade.ms_cursos.dto.request.AvaliacaoRequestDTO;
 import com.faculdade.ms_cursos.dto.response.AvaliacaoResponseDTO;
 import com.faculdade.ms_cursos.entities.AvaliacaoEntity;
 import com.faculdade.ms_cursos.kafka.AvaliacaoProducer;
-import com.faculdade.ms_cursos.kafka.dto.AvaliacaoCriadaEvent;
 import com.faculdade.ms_cursos.repositories.AvaliacaoRepository;
+import com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,5 +41,12 @@ public class AvaliacaoService implements IAvaliacaoService{
         avaliacaoProducer.sendAvaliacaoEvent(event);
 
         return  avaliacaoMapper.toDto(avaliacaoEntity);
+    }
+
+    @Override
+    public AvaliacaoResponseDTO buscarConsultaPorId(Long id) {
+        AvaliacaoEntity avaliacaoEntity = avaliacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Avaliação não encontrada com o ID: " + id));
+        return avaliacaoMapper.toDto(avaliacaoEntity);
     }
 }

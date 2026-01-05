@@ -11,11 +11,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+      value-type: com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent
+
 
 app:
   kafka:
     topic-notificacao: avaliacao-notificacao
-
 
 logging:
   level:
