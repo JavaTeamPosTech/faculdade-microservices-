@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://db-cursos:5432/${CURSOS_DB_NAME:curso_db}
-    #url: jdbc:postgresql://localhost:5432/db_avaliacoes
+    #url: jdbc:postgresql://localhost:5432/curso_db
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver

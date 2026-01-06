@@ -5,10 +5,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 public record AvaliacaoResponseDTO(
-        Long id,
-        Long idCurso,
-        Long idUsuario,
+        UUID id,
+        UUID idCurso,
+        UUID idUsuario,
         String descricao,
         Integer nota
 ) {

@@ -56,7 +56,7 @@ app:
   jwt:
     secret: ${APP_JWT_SECRET:my-secret-key-1234567890123456789012345678901234567890123456789012345678901234}
     expiration: ${APP_JWT_EXPIRATION_MS:86400000}
-  internal-secret: ${INTERNAL_SECRET:my-internal-secret}
+  internal-secret: ${INTERNAL_SECRET:my-secret-key}
 
 # ----------------------------------------------------
 # DOCUMENTAÇÃO E LOGS

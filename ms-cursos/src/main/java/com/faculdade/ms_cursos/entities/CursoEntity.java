@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,8 +19,8 @@ import lombok.Setter;
 public class CursoEntity {
 
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
+    private UUID id;
     private String nome;
     private String descricao;
 }

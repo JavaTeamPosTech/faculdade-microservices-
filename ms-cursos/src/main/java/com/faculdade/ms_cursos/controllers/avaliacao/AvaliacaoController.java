@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -36,25 +37,24 @@ public class AvaliacaoController {
             description = "Cria um novo agendamento, valida a disponibilidade do médico e publica um evento Kafka.")
     @ApiResponse(responseCode = "201", description = "Consulta criada com sucesso.")
     @ApiResponse(responseCode = "400", description = "Regra de Negócio violada (Ex: Conflito de horário, DTO inválido).")
-    @PreAuthorize("hasAnyAuthority('ALUNO')")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<AvaliacaoResponseDTO> criarConsulta(@RequestBody @Valid AvaliacaoRequestDTO request) {
-//        log.info("INICIANDO: POST /avaliacoes. Paciente: {}, Médico: {}, Data: {}",
-//                request.pacienteId(), request.medicoId(), request.dataConsulta());
-
-        AvaliacaoResponseDTO response = avaliacaoService.criarAvaliacao(request);
-
+    @PreAuthorize("hasAuthority('ALUNO')")
+    public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(
+            @RequestBody @Valid AvaliacaoRequestDTO request, Authentication authentication
+    ) {
+        AvaliacaoResponseDTO response = avaliacaoService.criarAvaliacao(request, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+
     @GetMapping("/{id}")
-//    @Operation(summary = "Buscar Consulta por ID (Acesso Granular)",
-//            description = "Retorna uma consulta. Pacientes só podem ver as suas.")
-//    @ApiResponse(responseCode = "200", description = "Consulta encontrada.")
-//    @ApiResponse(responseCode = "403", description = "Proibido. Usuário tenta acessar consulta de terceiros.")
-//    @PreAuthorize("hasAnyAuthority('MEDICO', 'ENFERMEIRO') or @consultaService.isPacienteDaConsulta(#id, authentication.principal.id.toString())")
+    @Operation(summary = "Buscar Avaliacao por ID (Acesso Granular)",
+            description = "Retorna uma avalição. Alunos só podem ver as suas.")
+    @ApiResponse(responseCode = "200", description = "Avaliação encontrada.")
+    @ApiResponse(responseCode = "403", description = "Proibido. Usuário tenta acessar avaliação de terceiros.")
+    @PreAuthorize("hasAnyAuthority('MEDICO', 'ENFERMEIRO') or @avaliacaoService.isAlunoDaAvaliacao(#id, authentication.principal.id.toString())")
     public ResponseEntity<AvaliacaoResponseDTO> buscarConsultaPorId(
-            @Parameter(description = "ID da consulta.") @PathVariable Long id) {
+            @Parameter(description = "ID da consulta.") @PathVariable UUID id) {
 
         //log.info("Requisição GET /consultas/{} recebida.", id);
 

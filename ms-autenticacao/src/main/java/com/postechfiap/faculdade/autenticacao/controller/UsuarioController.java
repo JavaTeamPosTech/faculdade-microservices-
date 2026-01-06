@@ -48,7 +48,7 @@ public class UsuarioController {
     @ApiResponse(responseCode = "200", description = "Sucesso. Retorna dados do usuário.")
     @ApiResponse(responseCode = "403", description = "Proibido. Usuário não tem permissão para acessar este ID.")
     @ApiResponse(responseCode = "404", description = "Não encontrado.")
-    @PreAuthorize("hasAnyAuthority('PROFESSOR', 'COORDENADOR', 'INTERNAL_SERVICE_ACCESS') or #id == authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority('ALUNO','PROFESSOR', 'COORDENADOR', 'INTERNAL_SERVICE_ACCESS') or #id == authentication.principal.id")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UsuarioResponse> buscarPorId(
             @Parameter(description = "UUID do usuário a ser buscado.") @PathVariable UUID id) {

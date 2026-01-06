@@ -22,7 +22,7 @@ public class OpenApiConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
                 .info(new Info()
-                        .title("Minha faculdade - Microserviço de Avaliacao")
+                        .title("Faculdade - Microserviço de Avaliação")
                         .version("1.0.0")
                         .description("API REST para gestão de cursos.")
                 );

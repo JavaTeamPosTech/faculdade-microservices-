@@ -1,4 +1,4 @@
-package com.faculdade.ms_cursos.Mapper;
+package com.faculdade.ms_cursos.mapper;
 
 import com.faculdade.ms_cursos.dto.request.AvaliacaoRequestDTO;
 import com.faculdade.ms_cursos.dto.response.AvaliacaoResponseDTO;
