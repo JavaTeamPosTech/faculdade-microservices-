@@ -13,7 +13,7 @@ services:
     volumes:
       - ./data/postgres_data/auth:/var/lib/postgresql/data
     networks:
-      - hospital_network
+      - faculdade_network
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
@@ -48,7 +48,7 @@ services:
         condition: service_started
     restart: on-failure
     networks:
-      - hospital_network
+      - faculdade_network
 
   # ------ DB CURSOS ------
   db-cursos:
@@ -63,7 +63,7 @@ services:
     volumes:
       - ./data/postgres_data/cursos:/var/lib/postgresql/data
     networks:
-      - hospital_network
+      - faculdade_network
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
@@ -95,7 +95,7 @@ services:
         condition: service_healthy
     restart: on-failure
     networks:
-      - hospital_network
+      - faculdade_network
 
   # ------ MS NOTIFICACAO ------
   ms-notificacao:
@@ -115,7 +115,7 @@ services:
         condition: service_started
     restart: on-failure
     networks:
-      - hospital_network
+      - faculdade_network
 
   # ------ MONGO ------
   db-notificacao-mongo:
@@ -130,7 +130,7 @@ services:
     volumes:
       - ./data/mongo_data/notificacao:/data/db
     networks:
-      - hospital_network
+      - faculdade_network
     restart: always
 
   mongo-express:
@@ -147,14 +147,14 @@ services:
     depends_on:
       - db-notificacao-mongo
     networks:
-      - hospital_network
+      - faculdade_network
 
   # ------ ZOOKEEPER ------
   zookeeper:
     image: zookeeper:3.8
     container_name: zookeeper
     networks:
-      - hospital_network
+      - faculdade_network
 
   # ------ KAFKA ------
   kafka:
@@ -175,7 +175,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
-      - hospital_network
+      - faculdade_network
     healthcheck:
       test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka:9092 || exit 1" ]
       interval: 10s
@@ -198,5 +198,5 @@ services:
 
 
 networks:
-  hospital_network:
+  faculdade_network:
     driver: bridge

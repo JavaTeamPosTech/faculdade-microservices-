@@ -7,9 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
  * Implementa GrantedAuthority para integração direta com o Spring Security.
  */
 public enum Role implements GrantedAuthority {
-    MEDICO("Medico"),
-    ENFERMEIRO("Enfermeiro"),
-    PACIENTE("Paciente");
+    ALUNO("Aluno"),
+    PROFESSOR("Professor"),
+    COORDENADOR("Coordenador");
 
     private final String authority;
 

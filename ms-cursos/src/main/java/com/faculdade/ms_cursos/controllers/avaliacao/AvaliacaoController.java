@@ -36,7 +36,7 @@ public class AvaliacaoController {
             description = "Cria um novo agendamento, valida a disponibilidade do médico e publica um evento Kafka.")
     @ApiResponse(responseCode = "201", description = "Consulta criada com sucesso.")
     @ApiResponse(responseCode = "400", description = "Regra de Negócio violada (Ex: Conflito de horário, DTO inválido).")
-    @PreAuthorize("hasAnyAuthority('PACIENTE','MEDICO', 'ENFERMEIRO')")
+    @PreAuthorize("hasAnyAuthority('ALUNO')")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<AvaliacaoResponseDTO> criarConsulta(@RequestBody @Valid AvaliacaoRequestDTO request) {
 //        log.info("INICIANDO: POST /avaliacoes. Paciente: {}, Médico: {}, Data: {}",

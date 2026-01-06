@@ -35,7 +35,7 @@ public class Usuario implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private com.postechfiap.meuhospital.core.Role role;
+    private Role role;
 
     @Column(nullable = false)
     private String nome;

@@ -1,26 +1,19 @@
 package com.postechfiap.faculdade.autenticacao.controller;
 
-import com.postechfiap.faculdade.autenticacao.exception.RecursoNaoEncontradoException;
-import com.postechfiap.faculdade.autenticacao.mapper.UsuarioMapper;
-import com.postechfiap.faculdade.autenticacao.security.JwtService;
-import com.postechfiap.faculdade.autenticacao.service.UsuarioService;
-import com.postechfiap.meuhospital.contracts.core.LoginRequest;
-import com.postechfiap.meuhospital.contracts.core.LoginResponse;
-import com.postechfiap.meuhospital.contracts.core.UsuarioRegisterRequest;
-import com.postechfiap.meuhospital.contracts.core.UsuarioResponse;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
+import com.postechfiap.faculdade.autenticacao.dto.LoginRequest;
+import com.postechfiap.faculdade.autenticacao.dto.LoginResponse;
+import com.postechfiap.faculdade.autenticacao.dto.UsuarioRegisterRequest;
+import com.postechfiap.faculdade.autenticacao.dto.UsuarioResponse;
+import com.postechfiap.faculdade.autenticacao.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller responsável pelos endpoints de autenticação e geração de tokens.

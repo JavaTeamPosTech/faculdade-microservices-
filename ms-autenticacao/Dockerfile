@@ -3,16 +3,15 @@ WORKDIR /app
 
 COPY pom.xml .
 
-COPY faculdade-contracts/pom.xml ./faculdade-contracts/
+COPY ms-contracts/pom.xml ./ms-contracts/
 COPY ms-autenticacao/pom.xml ./ms-autenticacao/
 
-COPY ms-agendamento/pom.xml ./ms-agendamento/
+COPY ms-cursos/pom.xml ./ms-cursos/
 COPY ms-notificacao/pom.xml ./ms-notificacao/
-COPY ms-historico/pom.xml ./ms-historico/
 
 RUN mvn dependency:go-offline -B
 
-COPY faculdade-contracts/src ./faculdade-contracts/src
+COPY ms-contracts/src ./ms-contracts/src
 COPY ms-autenticacao/src ./ms-autenticacao/src
 
 RUN mvn clean install -pl ms-autenticacao -am -Dfile.encoding=UTF-8 -B -V -DskipTests

@@ -68,7 +68,7 @@
 
 		<!-- Módulo de Contratos -->
 		<dependency>
-			<groupId>com.postechfiap.meuhospital</groupId>
+			<groupId>com.postechfiap.faculdade</groupId>
 			<artifactId>ms-contracts</artifactId>
 			<version>${project.version}</version>
 		</dependency>

@@ -3,7 +3,7 @@ server:
 
 spring:
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: notificacao-group
       auto-offset-reset: earliest

@@ -3,10 +3,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://db-cursos:5432/${CURSOS_DB_NAME}
+    url: jdbc:postgresql://db-cursos:5432/${CURSOS_DB_NAME:curso_db}
     #url: jdbc:postgresql://localhost:5432/db_avaliacoes
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -23,7 +23,7 @@ spring:
 #    topic-notificacao: notificacao-events
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     admin:
       auto-create: true
     producer:
@@ -35,8 +35,8 @@ app:
     topic-notificacao: avaliacao-notificacao
 
   jwt:
-    secret: ${APP_JWT_SECRET}
-    expiration: ${APP_JWT_EXPIRATION_MS}
+    secret: ${APP_JWT_SECRET:my-secret-key-1234567890123456789012345678901234567890123456789012345678901234}
+    expiration: ${APP_JWT_EXPIRATION_MS:86400000}
 
 
   auth-service-url: http://${AUTH_SERVICE_HOST}:${AUTH_SERVICE_PORT}/usuarios
