@@ -32,7 +32,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer realm=\"meuhospital\"");
+        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer realm=\"faculdade\"");
 
         var errorResponse = Map.of(
                 "timestamp", LocalDateTime.now().toString(),

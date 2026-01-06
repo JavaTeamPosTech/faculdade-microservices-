@@ -1,28 +1,23 @@
-# =========================
-# STAGE 1 - BUILD
-# =========================
-FROM maven:3.9.9-eclipse-temurin-21 AS build
-
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copia todo o monorepo
-COPY . .
+COPY pom.xml .
 
-# Builda todos os módulos e instala no local repository do container
-RUN mvn clean install -DskipTests
+COPY faculdade-contracts/pom.xml ./faculdade-contracts/
+COPY ms-autenticacao/pom.xml ./ms-autenticacao/
 
-# =========================
-# STAGE 2 - RUNTIME
-# =========================
-FROM eclipse-temurin:21-jre
+COPY ms-agendamento/pom.xml ./ms-agendamento/
+COPY ms-notificacao/pom.xml ./ms-notificacao/
+COPY ms-historico/pom.xml ./ms-historico/
 
+RUN mvn dependency:go-offline -B
+
+COPY faculdade-contracts/src ./faculdade-contracts/src
+COPY ms-autenticacao/src ./ms-autenticacao/src
+
+RUN mvn clean install -pl ms-autenticacao -am -Dfile.encoding=UTF-8 -B -V -DskipTests
+
+FROM eclipse-temurin:21
 WORKDIR /app
-
-# Copia apenas o jar do ms-autenticacao
 COPY --from=build /app/ms-autenticacao/target/*.jar app.jar
-
-# Porta que o microserviço vai expor
-EXPOSE 8080
-
-# Comando para iniciar a aplicação
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar"]

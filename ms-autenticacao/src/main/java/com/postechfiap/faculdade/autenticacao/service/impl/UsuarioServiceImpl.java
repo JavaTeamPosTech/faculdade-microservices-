@@ -1,28 +1,31 @@
 package com.postechfiap.faculdade.autenticacao.service.impl;
 
+import com.postechfiap.faculdade.autenticacao.dto.LoginRequest;
+import com.postechfiap.faculdade.autenticacao.dto.LoginResponse;
+import com.postechfiap.faculdade.autenticacao.dto.UsuarioRegisterRequest;
+import com.postechfiap.faculdade.autenticacao.dto.UsuarioResponse;
 import com.postechfiap.faculdade.autenticacao.entity.Usuario;
+import com.postechfiap.faculdade.autenticacao.enums.Role;
 import com.postechfiap.faculdade.autenticacao.exception.RecursoNaoEncontradoException;
 import com.postechfiap.faculdade.autenticacao.exception.UsuarioExistenteException;
-import com.postechfiap.faculdade.autenticacao.kafka.MedicoProducer;
 import com.postechfiap.faculdade.autenticacao.mapper.UsuarioMapper;
 import com.postechfiap.faculdade.autenticacao.repository.UsuarioRepository;
+import com.postechfiap.faculdade.autenticacao.security.JwtService;
 import com.postechfiap.faculdade.autenticacao.service.UsuarioService;
-import com.postechfiap.meuhospital.core.Role;
-import com.postechfiap.meuhospital.core.UsuarioRegisterRequest;
-import com.postechfiap.meuhospital.core.UsuarioResponse;
-import com.postechfiap.meuhospital.events.MedicoEvent;
-import com.postechfiap.meuhospital.usuario.PacienteResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Implementação do Serviço de gestão de usuários (CRUD e validação de domínio).
@@ -35,13 +38,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
-    private final MedicoProducer medicoProducer;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper, PasswordEncoder passwordEncoder, MedicoProducer medicoProducer) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
+                              UsuarioMapper usuarioMapper,
+                              PasswordEncoder passwordEncoder,
+                              @Lazy AuthenticationManager authenticationManager,
+                              JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.passwordEncoder = passwordEncoder;
-        this.medicoProducer = medicoProducer;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -61,11 +70,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
         log.info("Usuário ID {} salvo no banco de dados.", usuarioSalvo.getId());
 
-        if (usuarioSalvo.getRole() == Role.MEDICO) {
-            publishMedicoEvent(usuarioSalvo, "CRIACAO");
-            log.info("Evento MedicoEvent (CRIACAO) publicado para o ID: {}", usuarioSalvo.getId());
-        }
-
         return usuarioMapper.toResponse(usuarioSalvo);
     }
 
@@ -81,23 +85,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioMapper.toResponse(usuario);
     }
 
-    /**
-     * Lista todos os usuários com a Role PACIENTE.
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<PacienteResponse> listarPacientes() {
-        log.info("Iniciando listagem de todos os pacientes.");
-        List<Usuario> pacientes  = usuarioRepository.findByRole(Role.PACIENTE);
-
-        List<PacienteResponse> response = usuarioMapper.toResponseList(pacientes)
-                .stream()
-                .map(u -> new PacienteResponse(u.id(), u.nome(), u.cpf(), u.email(), u.telefone()))
-                .collect(Collectors.toList());
-
-        log.info("Listagem de pacientes concluída. Total: {}", response.size());
-        return response;
-    }
 
     /**
      * Busca um usuário pelo e-mail (usado principalmente pelo Spring Security e AuthController).
@@ -107,6 +94,36 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Optional<Usuario> buscarUsuarioPorEmail(String email) {
         log.debug("Tentativa de buscar usuário para autenticação por e-mail: {}", email);
         return usuarioRepository.findByEmail(email);
+    }
+
+    @Override
+    public LoginResponse autenticarUsuario(LoginRequest request) {
+        log.info("Iniciando processo de autenticação para o e-mail: {}", request.email());
+
+        try {
+            // 1. Autenticação (Verificação de senha)
+            var authToken = new UsernamePasswordAuthenticationToken(request.email(), request.senha());
+            Authentication authentication = authenticationManager.authenticate(authToken);
+
+            // 2. Geração do Token
+            String token = jwtService.generateToken(authentication);
+            log.debug("JWT gerado para o usuário: {}", request.email());
+
+            // 3. Busca de Detalhes para Resposta
+            UsuarioResponse usuarioResponse = usuarioRepository.findByEmail(request.email())
+                    .map(usuarioMapper::toResponse)
+                    .orElseThrow(() -> {
+                        log.error("ERRO GRAVE: Usuário autenticado ({}) não encontrado no banco.", request.email());
+                        return new RecursoNaoEncontradoException("Usuário não encontrado após autenticação.");
+                    });
+
+            log.info("SUCESSO: Login concluído. JWT e dados do usuário retornados.");
+            return new LoginResponse(token, usuarioResponse);
+
+        } catch (BadCredentialsException e) {
+            log.warn("FALHA LOGIN: Credenciais inválidas para o e-mail: {}", request.email());
+            throw e;
+        }
     }
 
     /**
@@ -131,55 +148,33 @@ public class UsuarioServiceImpl implements UsuarioService {
         Role role = request.role();
         log.debug("Validando campos condicionais para a Role: {}", role);
 
-        // Validação de Registro Profissional (Médico e Enfermeiro)
-        if (role == Role.MEDICO || role == Role.ENFERMEIRO) {
-            if (request.numeroRegistro() == null || request.numeroRegistro().isBlank()) {
-                log.warn("Validação falhou: {} sem número de registro.", role);
-                throw new IllegalArgumentException(role.name() + " deve fornecer um número de registro (CRM/COREN).");
-            }
+        if (role == null) {
+            throw new IllegalArgumentException("A Role (perfil) é obrigatória.");
         }
 
-        // Validação de Especialidade (Apenas Médico)
-        if (role == Role.MEDICO) {
-            if (request.especialidade() == null || request.especialidade().isBlank()) {
-                log.warn("Validação falhou: Médico sem especialidade.");
-                throw new IllegalArgumentException("Médico deve fornecer a especialidade.");
+        // Validação de Matrícula (Aluno)
+        if (role == Role.ALUNO) {
+            if (request.matricula() == null || request.matricula().isBlank()) {
+                log.warn("Validação falhou: Aluno sem matrícula.");
+                throw new IllegalArgumentException("Aluno deve fornecer a matrícula.");
             }
-        } else {
-            if (request.especialidade() != null && !request.especialidade().isBlank()) {
-                log.warn("Validação falhou: Especialidade definida para Role não-médica.");
-                throw new IllegalArgumentException("Apenas médicos podem ter especialidade definida.");
-            }
-        }
-
-        // Validação de Data de Nascimento (Apenas Paciente)
-        if (role == Role.PACIENTE) {
             if (request.dataNascimento() == null) {
-                log.warn("Validação falhou: Paciente sem data de nascimento.");
-                throw new IllegalArgumentException("Paciente deve fornecer a data de nascimento.");
+                log.warn("Validação falhou: Aluno sem data de nascimento.");
+                throw new IllegalArgumentException("Aluno deve fornecer a data de nascimento.");
             }
-        } else {
-            if (request.dataNascimento() != null) {
-                log.warn("Validação falhou: Data de nascimento definida para Role não-paciente.");
-                throw new IllegalArgumentException("A data de nascimento é exclusiva para o perfil Paciente.");
+            if (request.dataNascimento().isAfter(LocalDate.now())) {
+                log.warn("Validação falhou: Data de nascimento futura.");
+                throw new IllegalArgumentException("A data de nascimento não pode ser no futuro.");
+            }
+        }
+
+        // Validação de Departamento (Professor e Coordenador)
+        if (role == Role.PROFESSOR || role == Role.COORDENADOR) {
+            if (request.departamento() == null || request.departamento().isBlank()) {
+                log.warn("Validação falhou: {} sem departamento.", role);
+                throw new IllegalArgumentException(role.name() + " deve fornecer o departamento.");
             }
         }
     }
 
-    /**
-     * Publica o evento no Kafka.
-     */
-    private void publishMedicoEvent(Usuario medico, String tipoEvento) {
-        log.info("Publicando evento MedicoEvent para o tópico. Tipo: {}", tipoEvento);
-        MedicoEvent event = new MedicoEvent(
-                medico.getId(),
-                medico.getNome(),
-                medico.getNumeroRegistro(),
-                medico.getEspecialidade(),
-                medico.getRole(),
-                tipoEvento,
-                LocalDateTime.now()
-        );
-        medicoProducer.sendMedicoEvent(event);
-    }
 }

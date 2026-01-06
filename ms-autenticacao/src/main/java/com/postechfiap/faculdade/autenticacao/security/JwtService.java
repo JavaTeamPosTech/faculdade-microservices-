@@ -42,7 +42,14 @@ public class JwtService {
      * Gera o token JWT para o usuário autenticado.
      */
     public String generateToken(Authentication authentication) {
-        Usuario user = (Usuario) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        Usuario user;
+
+        if (principal instanceof Usuario) {
+            user = (Usuario) principal;
+        } else {
+             throw new IllegalArgumentException("Principal não é do tipo Usuario: " + principal.getClass());
+        }
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId().toString());
