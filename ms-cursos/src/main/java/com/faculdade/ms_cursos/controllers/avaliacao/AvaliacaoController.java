@@ -52,7 +52,7 @@ public class AvaliacaoController {
             description = "Retorna uma avalição. Alunos só podem ver as suas.")
     @ApiResponse(responseCode = "200", description = "Avaliação encontrada.")
     @ApiResponse(responseCode = "403", description = "Proibido. Usuário tenta acessar avaliação de terceiros.")
-    @PreAuthorize("hasAnyAuthority('ALUNO')")
+    @PreAuthorize("hasAnyAuthority('PROFESSOR')")
     public ResponseEntity<AvaliacaoResponseDTO> buscarConsultaPorId(
             @Parameter(description = "ID da consulta.") @PathVariable UUID id) {
 
