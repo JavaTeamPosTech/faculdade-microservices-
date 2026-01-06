@@ -1,6 +1,5 @@
 package com.postechfiap.faculdade.autenticacao.entity;
 
-import com.postechfiap.meuhospital.contracts.core.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +34,7 @@ public class Usuario implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private com.postechfiap.meuhospital.core.Role role;
 
     @Column(nullable = false)
     private String nome;

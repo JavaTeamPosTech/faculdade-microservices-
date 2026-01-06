@@ -1,6 +1,5 @@
-package com.postechfiap.faculdade.autenticacao.security;
+package com.faculdade.ms_cursos.security;
 
-import com.postechfiap.faculdade.autenticacao.repository.UsuarioRepository;
 import com.postechfiap.meuhospital.core.Role;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -20,30 +19,27 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-
 import java.util.UUID;
 
+/**
+ * Filtro JWT para o ms-agendamento.
+ * CRÍTICO: Não faz busca no banco. Apenas valida o token e cria o contexto de segurança
+ * com base nas Claims (ID e Role) presentes no JWT.
+ */
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UsuarioRepository usuarioRepository;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
-    public SecurityFilter(JwtService jwtService, UsuarioRepository usuarioRepository, CustomAuthenticationEntryPoint authenticationEntryPoint) {
+    public SecurityFilter(JwtService jwtService, CustomAuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtService = jwtService;
-        this.usuarioRepository = usuarioRepository;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String token = recoverToken(authHeader);
@@ -91,5 +87,13 @@ public class SecurityFilter extends OncePerRequestFilter {
         return authHeader.substring(7);
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
 
+        return path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/actuator") ||
+                path.equals("/swagger-ui.html");
+    }
 }

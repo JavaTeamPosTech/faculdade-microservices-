@@ -1,9 +1,9 @@
 package com.postechfiap.faculdade.autenticacao.service;
 
 import com.postechfiap.faculdade.autenticacao.entity.Usuario;
-import com.postechfiap.meuhospital.contracts.core.UsuarioRegisterRequest;
-import com.postechfiap.meuhospital.contracts.core.UsuarioResponse;
-import com.postechfiap.meuhospital.contracts.usuario.PacienteResponse;
+import com.postechfiap.meuhospital.core.UsuarioRegisterRequest;
+import com.postechfiap.meuhospital.core.UsuarioResponse;
+import com.postechfiap.meuhospital.usuario.PacienteResponse;
 
 import java.util.List;
 import java.util.Optional;

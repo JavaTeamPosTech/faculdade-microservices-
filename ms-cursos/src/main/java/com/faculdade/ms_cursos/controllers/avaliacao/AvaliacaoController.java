@@ -6,17 +6,20 @@ import com.faculdade.ms_cursos.services.IAvaliacaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RequestMapping("/avaliacoes")
 @RestController
-//@Tag(name = "Consultas", description = "Endpoints para agendamento e  gestão de consulta.")
-//@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Consultas", description = "Endpoints para agendamento e  gestão de consulta.")
+@SecurityRequirement(name = "bearerAuth")
 public class AvaliacaoController {
 
     private final IAvaliacaoService avaliacaoService;
@@ -29,11 +32,11 @@ public class AvaliacaoController {
      * Endpoint para criação de uma nova avaliacao.
      */
     @PostMapping
-//    @Operation(summary = "Criar Nova Consulta",
-//            description = "Cria um novo agendamento, valida a disponibilidade do médico e publica um evento Kafka.")
-//    @ApiResponse(responseCode = "201", description = "Consulta criada com sucesso.")
-//    @ApiResponse(responseCode = "400", description = "Regra de Negócio violada (Ex: Conflito de horário, DTO inválido).")
-//    @PreAuthorize("hasAnyAuthority('MEDICO', 'ENFERMEIRO')")
+    @Operation(summary = "Criar Nova Consulta",
+            description = "Cria um novo agendamento, valida a disponibilidade do médico e publica um evento Kafka.")
+    @ApiResponse(responseCode = "201", description = "Consulta criada com sucesso.")
+    @ApiResponse(responseCode = "400", description = "Regra de Negócio violada (Ex: Conflito de horário, DTO inválido).")
+    @PreAuthorize("hasAnyAuthority('PACIENTE','MEDICO', 'ENFERMEIRO')")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<AvaliacaoResponseDTO> criarConsulta(@RequestBody @Valid AvaliacaoRequestDTO request) {
 //        log.info("INICIANDO: POST /avaliacoes. Paciente: {}, Médico: {}, Data: {}",

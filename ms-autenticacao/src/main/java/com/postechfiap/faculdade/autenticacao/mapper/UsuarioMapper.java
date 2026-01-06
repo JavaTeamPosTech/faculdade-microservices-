@@ -1,8 +1,8 @@
 package com.postechfiap.faculdade.autenticacao.mapper;
 
 import com.postechfiap.faculdade.autenticacao.entity.Usuario;
-import com.postechfiap.meuhospital.contracts.core.UsuarioRegisterRequest;
-import com.postechfiap.meuhospital.contracts.core.UsuarioResponse;
+import com.postechfiap.meuhospital.core.UsuarioRegisterRequest;
+import com.postechfiap.meuhospital.core.UsuarioResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class UsuarioMapper {
      * @param entity Entidade Usuario persistida.
      * @return DTO UsuarioResponse, sem a senha.
      */
-    public UsuarioResponse toResponse(Usuario entity) {
+    public com.postechfiap.meuhospital.core.UsuarioResponse toResponse(Usuario entity) {
         if (entity == null) {
             return null;
         }

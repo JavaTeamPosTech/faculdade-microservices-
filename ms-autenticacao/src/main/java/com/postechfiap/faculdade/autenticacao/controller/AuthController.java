@@ -4,10 +4,10 @@ import com.postechfiap.faculdade.autenticacao.exception.RecursoNaoEncontradoExce
 import com.postechfiap.faculdade.autenticacao.mapper.UsuarioMapper;
 import com.postechfiap.faculdade.autenticacao.security.JwtService;
 import com.postechfiap.faculdade.autenticacao.service.UsuarioService;
-import com.postechfiap.meuhospital.contracts.core.LoginRequest;
-import com.postechfiap.meuhospital.contracts.core.LoginResponse;
-import com.postechfiap.meuhospital.contracts.core.UsuarioRegisterRequest;
-import com.postechfiap.meuhospital.contracts.core.UsuarioResponse;
+import com.postechfiap.meuhospital.core.LoginRequest;
+import com.postechfiap.meuhospital.core.LoginResponse;
+import com.postechfiap.meuhospital.core.UsuarioRegisterRequest;
+import com.postechfiap.meuhospital.core.UsuarioResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

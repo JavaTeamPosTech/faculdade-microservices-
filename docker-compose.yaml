@@ -1,5 +1,55 @@
 services:
 
+  # ------ MS AUTENTICAÇÃO ------
+  db-auth:
+    image: postgres:16-alpine
+    container_name: db-auth
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${AUTENTICACAO_DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres_data/auth:/var/lib/postgresql/data
+    networks:
+      - hospital_network
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ms-autenticacao:
+    build:
+      context: .
+      dockerfile: ./ms-autenticacao/Dockerfile
+    container_name: ms-autenticacao
+    ports:
+      - "8080:8080"
+      - "5006:5005"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-auth:5432/${AUTENTICACAO_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      APP_JWT_SECRET: ${JWT_SECRET}
+      APP_JWT_EXPIRATION_MS: ${APP_JWT_EXPIRATION_MS}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      AUTH_SERVICE_URL: http://ms-autenticacao:8080/usuarios
+      INTERNAL_SECRET: ${INTERNAL_SECRET}
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    depends_on:
+      db-auth:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - hospital_network
+
   # ------ DB CURSOS ------
   db-cursos:
     image: postgres:16-alpine
@@ -35,6 +85,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      APP_JWT_SECRET: ${JWT_SECRET}
+      APP_JWT_EXPIRATION_MS: ${APP_JWT_EXPIRATION_MS}
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     depends_on:
       db-cursos:

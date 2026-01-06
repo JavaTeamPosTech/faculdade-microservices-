@@ -1,7 +1,7 @@
 package com.postechfiap.faculdade.autenticacao.repository;
 
 import com.postechfiap.faculdade.autenticacao.entity.Usuario;
-import com.postechfiap.meuhospital.contracts.core.Role;
+import com.postechfiap.meuhospital.core.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

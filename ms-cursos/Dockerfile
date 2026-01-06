@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=build /app/ms-cursos/target/*.jar app.jar
 
 # Porta que o microserviço vai expor
-EXPOSE 8082
+EXPOSE 8084
 
 # Comando para iniciar a aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]

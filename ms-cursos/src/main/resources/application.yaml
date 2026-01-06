@@ -4,8 +4,9 @@ server:
 spring:
   datasource:
     url: jdbc:postgresql://db-cursos:5432/${CURSOS_DB_NAME}
-    username: postgres
-    password: postgres
+    #url: jdbc:postgresql://localhost:5432/db_avaliacoes
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -32,4 +33,12 @@ spring:
 app:
   kafka:
     topic-notificacao: avaliacao-notificacao
+
+  jwt:
+    secret: ${APP_JWT_SECRET}
+    expiration: ${APP_JWT_EXPIRATION_MS}
+
+
+  auth-service-url: http://${AUTH_SERVICE_HOST}:${AUTH_SERVICE_PORT}/usuarios
+  internal-secret: ${INTERNAL_SECRET}
 

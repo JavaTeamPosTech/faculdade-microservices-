@@ -30,9 +30,9 @@
 
   <modules>
     <module>ms-contracts</module>
+    <module>ms-autenticacao</module>
     <module>ms-cursos</module>
     <module>ms-notificacao</module>
-<!--    <module>ms-autenticacao</module>-->
   </modules>
 
   <dependencyManagement>
