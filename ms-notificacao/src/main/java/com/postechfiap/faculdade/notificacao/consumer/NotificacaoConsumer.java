@@ -1,5 +1,6 @@
 package com.postechfiap.faculdade.notificacao.consumer;
 
+import com.postechfiap.faculdade.notificacao.client.WebClientEmailFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,12 +14,12 @@ public class NotificacaoConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(NotificacaoConsumer.class);
     private static final String NOTIFICACAO_TOPIC = "notificacao-events";
+    private final WebClientEmailFunction webClientEmailFunction;
 
-    //private final NotificacaoService notificacaoService;
 
-//    public NotificacaoConsumer(NotificacaoService notificacaoService) {
-//        this.notificacaoService = notificacaoService;
-//    }
+    public NotificacaoConsumer(WebClientEmailFunction webClientEmailFunction){
+        this.webClientEmailFunction = webClientEmailFunction;
+    }
 
     /**
      * Listener que consome eventos de atualização/criação de consultas.
@@ -34,6 +35,8 @@ public class NotificacaoConsumer {
         System.out.println("Evento AvaliacaoCriadaEvent recebido: " + event);
 
         try {
+            //chamando azure function
+            webClientEmailFunction.chamarFunction();
             //notificacaoService.processarNotificacao(event);
         } catch (Exception e) {
             log.error("Erro FATAL ao processar evento de notificação para a Consulta ID {}. O log será salvo com status 'FALHA'.", event.idCurso(), e);

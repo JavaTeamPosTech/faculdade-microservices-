@@ -14,7 +14,6 @@ import com.faculdade.ms_cursos.repositories.CursoRepository;
 import com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -57,7 +56,6 @@ public class AvaliacaoService implements IAvaliacaoService {
                     avaliacaoEntity.getNota(),
                     LocalDateTime.now()
             );
-
             //Envio da avaliacao via kafka para geração do email
             avaliacaoProducer.sendAvaliacaoEvent(event);
         }
