@@ -32,7 +32,7 @@ public class KafkaConfig {
      */
     @Bean
     public ConsumerFactory<String, AvaliacaoCriadaEvent> consumerFactory() {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
 
         //props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AvaliacaoCriadaEvent.class);

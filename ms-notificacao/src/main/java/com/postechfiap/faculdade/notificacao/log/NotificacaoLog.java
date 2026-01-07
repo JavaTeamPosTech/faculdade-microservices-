@@ -1,8 +1,6 @@
 package com.postechfiap.faculdade.notificacao.log;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,10 +9,10 @@ import java.util.UUID;
  * Documento MongoDB para armazenar o histórico de notificações enviadas.
  */
 @Data
-@Document(collection = "logs_notificacao")
+//@Document(collection = "logs_notificacao")
 public class NotificacaoLog {
 
-    @Id
+    //@Id
     private String id; // MongoDB usa String para o ID (ObjectId)
 
     private UUID consultaId;
