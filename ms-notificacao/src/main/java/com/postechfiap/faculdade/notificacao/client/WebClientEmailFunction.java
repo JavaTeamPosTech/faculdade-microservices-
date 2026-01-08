@@ -20,7 +20,7 @@ public class WebClientEmailFunction {
         System.out.println("Chamando Azure Function para enviar email...");
         String resposta = webClient
                 .post()
-                .uri("https://frase-function-v2.azurewebsites.net/api/enviarEmail?code=uG5kTZr25nVcNdCRvJ4mBeNCsJpikgpxxDeZ4TAg-DD0AzFuiFaa1Q==")
+                .uri("")
                 .bodyValue(dto)
                 .retrieve()
                 .bodyToMono(String.class)
