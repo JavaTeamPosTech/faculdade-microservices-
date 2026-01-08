@@ -7,6 +7,7 @@ public record AvaliacaoCriadaEvent(
         UUID idAvaliacao,
         UUID idUsuario,
         UUID idCurso,
+        String emailProfessor,
         String descricao,
         Integer nota,
         LocalDateTime dataHoraAvaliacao

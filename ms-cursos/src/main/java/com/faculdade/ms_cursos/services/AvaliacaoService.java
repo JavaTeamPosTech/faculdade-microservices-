@@ -45,6 +45,11 @@ public class AvaliacaoService implements IAvaliacaoService {
             if(!request.idUsuario().toString().equals(alunoId)){
                 throw new RegraDeNegocioException("Usuário logado não corresponde ao usuário da avaliação.");
             }
+
+            //Busca a entidade curso no banco de dados
+            CursoEntity cursoEntity = cursoRepository.findById(request.idCurso())
+                    .orElseThrow(() -> new RegraDeNegocioException("Curso não encontrado com o ID: " + request.idCurso()));
+
             //faz a conversão e retorna o dto salvo
 
             avaliacaoEntity = avaliacaoRepository.save(avaliacaoMapper.toEntity(request));
@@ -52,6 +57,7 @@ public class AvaliacaoService implements IAvaliacaoService {
                     avaliacaoEntity.getId(),
                     avaliacaoEntity.getIdUsuario(),
                     avaliacaoEntity.getIdCurso(),
+                    cursoEntity.getEmailProfessor(),
                     avaliacaoEntity.getDescricao(),
                     avaliacaoEntity.getNota(),
                     LocalDateTime.now()
@@ -82,4 +88,6 @@ public class AvaliacaoService implements IAvaliacaoService {
     public UsuarioDetails buscarUsuarioPorId(UUID idUsuario) {
         return authClientService.buscarUsuarioPorId(idUsuario);
     }
+
+
 }

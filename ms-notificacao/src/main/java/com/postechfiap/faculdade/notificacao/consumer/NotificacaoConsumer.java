@@ -35,11 +35,13 @@ public class NotificacaoConsumer {
         System.out.println("Evento AvaliacaoCriadaEvent recebido: " + event);
 
         try {
-            //chamando azure function
-            webClientEmailFunction.chamarFunction();
-            //notificacaoService.processarNotificacao(event);
+            //Se a nota for positiva, não envia
+            if(event.nota() < 6){
+                //chamando azure function
+                webClientEmailFunction.chamarFunction(event);
+            }
         } catch (Exception e) {
-            log.error("Erro FATAL ao processar evento de notificação para a Consulta ID {}. O log será salvo com status 'FALHA'.", event.idCurso(), e);
+            log.error("Erro FATAL ao processar evento de notificação para a Avaliação ID {}. O log será salvo com status 'FALHA'.", event.idCurso(), e);
         }
     }
 }

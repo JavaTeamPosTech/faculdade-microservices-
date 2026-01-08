@@ -1,5 +1,6 @@
 package com.faculdade.ms_cursos.client;
 
+import com.faculdade.ms_cursos.client.dto.CursoDetails;
 import com.faculdade.ms_cursos.client.dto.UsuarioDetails;
 import com.faculdade.ms_cursos.exception.RecursoNaoEncontradoException;
 
@@ -76,4 +77,39 @@ public class AuthClientService {
             throw new RuntimeException("Falha na comunicação síncrona com o ms-autenticacao: " + e.getMessage(), e);
         }
     }
+
+    public CursoDetails buscarCursoPorIdCurso(UUID idCurso){
+        String url = authServiceBaseUrl + "/cursos/" + idCurso.toString();
+        log.info("RPC INICIADO: Buscando Usuario ID {} via GET {}", idCurso, url);
+
+        try {
+            CursoDetails response = webClient.get()
+                    .uri(url)
+                    .header(INTERNAL_SECRET_HEADER, internalSecret)
+                    .retrieve()
+
+                    // Tratamento de 404 (Recurso Não Encontrado)
+                    .onStatus(status -> status == HttpStatus.NOT_FOUND,
+                            clientResponse -> {
+                                log.warn("RPC FALHOU: 404 Not Found para o ID {}", idCurso);
+                                return Mono.error(new RecursoNaoEncontradoException("Usuário com ID " + idCurso + " não encontrado no sistema de Autenticação."));
+                            })
+
+                    .bodyToMono(CursoDetails.class)
+                    .block(); // Chamada síncrona
+
+            log.info("RPC SUCESSO: Detalhes do Usuario ID {} recebidos.", idCurso);
+            return response;
+
+        } catch (WebClientResponseException e) {
+            // Tratamento de falhas de segurança (401/403) ou 5xx
+            if (e.getStatusCode() == HttpStatus.FORBIDDEN || e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                log.error("RPC FALHOU: Acesso negado ao ms-autenticacao. Status: {}", e.getStatusCode());
+                throw new RuntimeException("Falha na autenticação de serviço: Chave interna inválida ou acesso negado.", e);
+            }
+            log.error("RPC FALHOU: Erro inesperado na comunicação síncrona. Status: {}", e.getStatusCode(), e);
+            throw new RuntimeException("Falha na comunicação síncrona com o ms-autenticacao: " + e.getMessage(), e);
+        }
+    }
+
 }
