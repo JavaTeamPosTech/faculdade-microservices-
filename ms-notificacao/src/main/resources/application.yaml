@@ -3,7 +3,7 @@ server:
 
 spring:
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${APPSETTING_KAFKA_BOOTSTRAP_SERVERS:fallback}
     consumer:
       group-id: notificacao-group
       auto-offset-reset: earliest
@@ -11,8 +11,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-      value-type: com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent
-
+        spring.json.value.default.type: com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent
+    # ESTE BLOCO ABAIXO É O QUE FALTA:
+    properties:
+      security.protocol: ${APPSETTING_KAFKA_SECURITY_PROTOCOL:fallback}
+      sasl.mechanism: ${APPSETTING_KAFKA_SASL_MECHANISM:fallback}
+      sasl.jaas.config: ${APPSETTING_KAFKA_SASL_JAAS_CONFIG:fallback}
 
 app:
   kafka:

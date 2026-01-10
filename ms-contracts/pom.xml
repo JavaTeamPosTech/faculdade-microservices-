@@ -52,18 +52,20 @@
     <build>
         <plugins>
             <plugin>
+
+                <!--NÃO SUBIR NA AZURE-->
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-webapp-maven-plugin</artifactId>
                 <version>2.13.0</version>
                 <configuration>
                     <schemaVersion>v2</schemaVersion>
-                    <resourceGroup>ms-contracts-1767878961020-rg</resourceGroup>
+                    <resourceGroup>rg-minhafaculdade</resourceGroup>
                     <appName>ms-contracts-1767878961020</appName>
-                    <pricingTier>P1v2</pricingTier>
+                    <pricingTier>B1</pricingTier>
                     <region>centralus</region>
                     <runtime>
                         <os>Linux</os>
-                        <javaVersion>Java 17</javaVersion>
+                        <javaVersion>Java 21</javaVersion>
                         <webContainer>Java SE</webContainer>
                     </runtime>
                     <deployment>

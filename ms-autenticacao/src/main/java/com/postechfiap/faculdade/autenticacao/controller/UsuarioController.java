@@ -2,7 +2,6 @@ package com.postechfiap.faculdade.autenticacao.controller;
 
 import com.postechfiap.faculdade.autenticacao.dto.UsuarioResponse;
 import com.postechfiap.faculdade.autenticacao.service.UsuarioService;
-import com.postechfiap.meuhospital.usuario.PacienteResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

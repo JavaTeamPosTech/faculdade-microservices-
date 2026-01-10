@@ -33,9 +33,9 @@ public class AvaliacaoController {
      * Endpoint para criação de uma nova avaliacao.
      */
     @PostMapping
-    @Operation(summary = "Criar Nova Consulta",
-            description = "Cria um novo agendamento, valida a disponibilidade do médico e publica um evento Kafka.")
-    @ApiResponse(responseCode = "201", description = "Consulta criada com sucesso.")
+    @Operation(summary = "Criar Nova Avaliação",
+            description = "Cria uma nova avaliação, valida e publica um evento Kafka.")
+    @ApiResponse(responseCode = "201", description = "Avaliação criada com sucesso.")
     @ApiResponse(responseCode = "400", description = "Regra de Negócio violada (Ex: Conflito de horário, DTO inválido).")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ALUNO')")

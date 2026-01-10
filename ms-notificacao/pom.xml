@@ -83,13 +83,13 @@
 		        <version>2.13.0</version>
 		        <configuration>
 		            <schemaVersion>v2</schemaVersion>
-		            <resourceGroup>ms-notificacao-1767879021233-rg</resourceGroup>
+		            <resourceGroup>rg-minhafaculdade</resourceGroup>
 		            <appName>ms-notificacao-1767879021233</appName>
-		            <pricingTier>P1v2</pricingTier>
+		            <pricingTier>B1</pricingTier>
 		            <region>centralus</region>
 		            <runtime>
 		                <os>Linux</os>
-		                <javaVersion>Java 17</javaVersion>
+		                <javaVersion>Java 21</javaVersion>
 		                <webContainer>Java SE</webContainer>
 		            </runtime>
 		            <deployment>

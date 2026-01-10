@@ -95,7 +95,7 @@
 		        <version>2.13.0</version>
 		        <configuration>
 		            <schemaVersion>v2</schemaVersion>
-		            <resourceGroup>ms-autenticacao-1767878790790-rg</resourceGroup>
+		            <resourceGroup>rg-minhafaculdade</resourceGroup>
 		            <appName>ms-autenticacao-1767878790790</appName>
 		            <pricingTier>B1</pricingTier>
 		            <region>centralus</region>
