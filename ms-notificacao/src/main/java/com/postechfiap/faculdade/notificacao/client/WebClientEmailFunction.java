@@ -18,9 +18,10 @@ public class WebClientEmailFunction {
         dto.setAssunto("Avalição do aluno");
         dto.setCorpo(event.descricao());
         System.out.println("Chamando Azure Function para enviar email...");
+        String endpoint = System.getenv("APPSETTING_URL_FUNCTION_ENVIAR_EMAIL");
         String resposta = webClient
                 .post()
-                .uri("")
+                .uri(endpoint)
                 .bodyValue(dto)
                 .retrieve()
                 .bodyToMono(String.class)
