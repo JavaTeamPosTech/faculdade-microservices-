@@ -27,9 +27,9 @@ public class OpenApiConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
                 .info(new Info()
-                        .title("Meu Hospital - Microserviço de Autenticação")
+                        .title("Faculdade - Microserviço de Autenticação")
                         .version("1.0.0")
-                        .description("API REST para gestão de usuários (Médicos, Enfermeiros, Pacientes) e geração de Tokens JWT.")
+                        .description("API REST para gestão de usuários (Aluno, Professores...) e geração de Tokens JWT.")
                 );
     }
 }

@@ -1,0 +1,59 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${APPSETTING_CURSO_SERVICE_HOST:fallback}:${APPSETTING_DB_PORT:5432}/${APPSETTING_CURSO_DB_NAME:fallback}
+    #url: jdbc:postgresql://${CURSO_SERVICE_HOST:banco-faculdade-postech-curso.postgres.database.azure.com}:${DB_PORT:5432}/${CURSO_DB_NAME:postgres}
+    username: ${APPSETTING_DB_CURSO_USERNAME:fallback}
+    password: ${APPSETTING_DB_CURSO_PASSWORD:fallback}
+    #username: ${DB_USERNAME:postgres}
+    #password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+#  kafka:
+#    #topic-medico-update: medico-events
+#    topic-notificacao: notificacao-events
+
+  kafka:
+    bootstrap-servers: evh-postech-faculdade.servicebus.windows.net:9093
+    admin:
+      auto-create: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      security.protocol: ${APPSETTING_KAFKA_SECURITY_PROTOCOL:fallback}
+      sasl.mechanism: ${APPSETTING_KAFKA_SASL_MECHANISM:fallback}
+      sasl.jaas.config: ${APPSETTING_KAFKA_SASL_JAAS_CONFIG:fallback}
+
+#  kafka:
+#    #bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+#    admin:
+#      auto-create: true
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+app:
+  kafka:
+    topic-notificacao: avaliacao-notificacao
+
+  jwt:
+    secret: ${APPSETTING_APP_JWT_SECRET:fallback}
+    expiration: ${APPSETTING_APP_JWT_EXPIRATION_MS:fallback}
+
+
+  #auth-service-url: http://${AUTH_SERVICE_HOST:localhost}:${AUTH_SERVICE_PORT:8080}/usuarios
+  auth-service-url: https://ms-autenticacao-1767878790790.azurewebsites.net/usuarios/
+  internal-secret: ${APPSETTING_INTERNAL_SECRET:fallback}
+

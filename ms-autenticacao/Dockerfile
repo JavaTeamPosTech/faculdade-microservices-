@@ -3,16 +3,15 @@ WORKDIR /app
 
 COPY pom.xml .
 
-COPY meuhospital-contracts/pom.xml ./meuhospital-contracts/
+COPY ms-contracts/pom.xml ./ms-contracts/
 COPY ms-autenticacao/pom.xml ./ms-autenticacao/
 
-COPY ms-agendamento/pom.xml ./ms-agendamento/
+COPY ms-cursos/pom.xml ./ms-cursos/
 COPY ms-notificacao/pom.xml ./ms-notificacao/
-COPY ms-historico/pom.xml ./ms-historico/
 
 RUN mvn dependency:go-offline -B
 
-COPY meuhospital-contracts/src ./meuhospital-contracts/src
+COPY ms-contracts/src ./ms-contracts/src
 COPY ms-autenticacao/src ./ms-autenticacao/src
 
 RUN mvn clean install -pl ms-autenticacao -am -Dfile.encoding=UTF-8 -B -V -DskipTests

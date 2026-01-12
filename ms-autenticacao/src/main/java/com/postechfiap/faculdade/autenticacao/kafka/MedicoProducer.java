@@ -1,6 +1,6 @@
 package com.postechfiap.faculdade.autenticacao.kafka;
 
-import com.postechfiap.meuhospital.contracts.events.MedicoEvent;
+import com.postechfiap.meuhospital.events.MedicoEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 

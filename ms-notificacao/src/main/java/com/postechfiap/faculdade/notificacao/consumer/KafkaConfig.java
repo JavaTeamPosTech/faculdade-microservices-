@@ -1,6 +1,6 @@
 package com.postechfiap.faculdade.notificacao.consumer;
 
-import com.postechfiap.meuhospital.contracts.events.ConsultaCriadaEvent;
+import com.postechfiap.meuhospital.dto.AvaliacaoCriadaEvent;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,23 +31,24 @@ public class KafkaConfig {
      * Define o ConsumerFactory configurado para desserializar o DTO de evento específico.
      */
     @Bean
-    public ConsumerFactory<String, ConsultaCriadaEvent> consumerFactory() {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+    public ConsumerFactory<String, AvaliacaoCriadaEvent> consumerFactory() {
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
 
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, ConsultaCriadaEvent.class);
+        //props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AvaliacaoCriadaEvent.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
 
         return new DefaultKafkaConsumerFactory<>(props,
                 new StringDeserializer(),
-                new JsonDeserializer<>(ConsultaCriadaEvent.class, false));
+                new JsonDeserializer<>(AvaliacaoCriadaEvent.class, false));
     }
 
     /**
      * Cria o ContainerFactory, que gerencia os @KafkaListener.
      */
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ConsultaCriadaEvent> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ConsultaCriadaEvent> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, AvaliacaoCriadaEvent> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, AvaliacaoCriadaEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;

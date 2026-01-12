@@ -1,7 +1,7 @@
 package com.postechfiap.faculdade.autenticacao.security;
 
 import com.postechfiap.faculdade.autenticacao.repository.UsuarioRepository;
-import com.postechfiap.meuhospital.contracts.core.Role;
+import com.postechfiap.meuhospital.core.Role;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

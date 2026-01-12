@@ -1,21 +1,43 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
+# -------------------------
+# Copia o POM pai
+# -------------------------
 COPY pom.xml .
 
-COPY meuhospital-contracts/pom.xml ./meuhospital-contracts/
-COPY ms-notificacao/pom.xml ./ms-notificacao/
+# -------------------------
+# Copia TODOS os poms dos módulos
+# (necessário por causa do <modules> no pom pai)
+# -------------------------
+COPY ms-contracts/pom.xml ms-contracts/pom.xml
+COPY ms-autenticacao/pom.xml ms-autenticacao/pom.xml
+COPY ms-cursos/pom.xml ms-cursos/pom.xml
+COPY ms-notificacao/pom.xml ms-notificacao/pom.xml
 
-COPY ms-autenticacao/pom.xml ./ms-autenticacao/
-COPY ms-agendamento/pom.xml ./ms-agendamento/
-COPY ms-historico/pom.xml ./ms-historico/
+# -------------------------
+# Cache de dependências
+# -------------------------
+RUN mvn dependency:go-offline -B
 
-COPY meuhospital-contracts/src ./meuhospital-contracts/src
-COPY ms-notificacao/src ./ms-notificacao/src
+# -------------------------
+# Copia apenas os sources necessários
+# -------------------------
+COPY ms-contracts/src ms-contracts/src
+COPY ms-notificacao/src ms-notificacao/src
 
-RUN mvn clean install -pl ms-notificacao -am -Dfile.encoding=UTF-8 -B -V -DskipTests
+# -------------------------
+# Build somente do ms-notificacao
+# -------------------------
+RUN mvn clean package -pl ms-notificacao -am -DskipTests
 
-FROM eclipse-temurin:21
+# =========================
+# STAGE 2 - RUNTIME
+# =========================
+FROM eclipse-temurin:21-jre
 WORKDIR /app
+
 COPY --from=build /app/ms-notificacao/target/*.jar app.jar
-CMD ["java", "-jar", "app.jar"]
+
+EXPOSE 8082
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.persistence.Convert;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,8 +31,8 @@ public class JwtService {
 
     public JwtService(@Value("${app.jwt.secret}") String secret,
                       @Value("${app.jwt.expiration}") long expirationTime) {
-        this.secret = secret;
-        this.expirationTime = expirationTime;
+        this.secret = System.getenv("APPSETTING_APP_JWT_SECRET");
+        this.expirationTime = 86400000;
     }
 
     private SecretKey getSigningKey() {
@@ -42,7 +43,14 @@ public class JwtService {
      * Gera o token JWT para o usuário autenticado.
      */
     public String generateToken(Authentication authentication) {
-        Usuario user = (Usuario) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        Usuario user;
+
+        if (principal instanceof Usuario) {
+            user = (Usuario) principal;
+        } else {
+             throw new IllegalArgumentException("Principal não é do tipo Usuario: " + principal.getClass());
+        }
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId().toString());
